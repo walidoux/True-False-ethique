@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz — Éthique, Déontologie & PI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #16161d;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #6c63ff;
+    --accent2: #00d4aa;
+    --danger: #ff5370;
+    --success: #00d4aa;
+    --warning: #ffb830;
+    --text: #e8e8f0;
+    --muted: #7878a0;
+    --card-radius: 16px;
+    --font: 'Sora', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -150px; right: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+  .site-header .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    border: 1px solid rgba(0,212,170,0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .site-header h1 {
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 700;
+    line-height: 1.25;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .site-header p {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── HOME ── */
+  .home-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 28px 0;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .val {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: var(--mono);
+  }
+  .stat-card .lbl {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .theme-select-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .theme-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: var(--font);
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    line-height: 1.4;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--text); }
+  .theme-btn.selected {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.12);
+    color: var(--accent);
+  }
+
+  .options-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .toggle-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-btn.on {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: rgba(0,212,170,0.08);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    width: 100%;
+    font-size: 16px;
+  }
+  .btn-primary:hover { background: #7c74ff; transform: translateY(-1px); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── QUIZ SCREEN ── */
+  .quiz-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+  .q-counter {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .prog-wrap { flex: 1; }
+  .prog-bg {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .prog-fill {
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .score-live {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent2);
+    white-space: nowrap;
+  }
+
+  .theme-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--accent);
+    border: 1px solid rgba(108,99,255,0.4);
+    background: rgba(108,99,255,0.08);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    letter-spacing: 0.05em;
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 28px 24px 24px;
+    margin-bottom: 16px;
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .q-text {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+
+  .ans-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .ans-btn {
+    padding: 16px;
+    border-radius: 12px;
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .ans-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(108,99,255,0.1);
+  }
+  .ans-btn:disabled { cursor: default; }
+  .ans-btn.correct {
+    border-color: var(--success);
+    background: rgba(0,212,170,0.12);
+    color: var(--success);
+  }
+  .ans-btn.wrong {
+    border-color: var(--danger);
+    background: rgba(255,83,112,0.12);
+    color: var(--danger);
+  }
+  .ans-btn.reveal {
+    border-color: var(--success);
+    background: rgba(0,212,170,0.06);
+    color: var(--success);
+    opacity: 0.6;
+  }
+
+  .feedback-box {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 16px;
+    border-left: 3px solid var(--success);
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+  .feedback-box.wrong { border-left-color: var(--danger); }
+  .feedback-box.show { display: block; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .feedback-result {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .feedback-result.ok { color: var(--success); }
+  .feedback-result.ko { color: var(--danger); }
+  .feedback-exp {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .btn-next-wrap {
+    display: none;
+    margin-top: 16px;
+  }
+  .btn-next-wrap.show { display: block; }
+
+  /* ── RESULTS ── */
+  .result-hero {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+  .result-circle {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent) 0%, var(--accent2) var(--pct), var(--border) var(--pct));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .result-circle::after {
+    content: '';
+    position: absolute;
+    width: 88px; height: 88px;
+    background: var(--bg);
+    border-radius: 50%;
+  }
+  .result-pct {
+    position: absolute;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--mono);
+    z-index: 1;
+    color: var(--text);
+  }
+  .result-msg {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .result-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .result-stats {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .result-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+  }
+  .result-stat .n { font-size: 28px; font-weight: 700; font-family: var(--mono); }
+  .result-stat .n.g { color: var(--success); }
+  .result-stat .n.r { color: var(--danger); }
+  .result-stat .n.b { color: var(--accent); }
+  .result-stat .l { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-top: 4px; letter-spacing: 0.05em; }
+  .result-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .result-btns .btn { flex: 1; min-width: 140px; }
+
+  /* ── CORRECTIONS ── */
+  .corr-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+  }
+  .corr-item.ok { border-left: 3px solid var(--success); }
+  .corr-item.ko { border-left: 3px solid var(--danger); }
+  .corr-q { font-size: 14px; line-height: 1.5; margin-bottom: 10px; }
+  .corr-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; }
+  .corr-tag {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+  .corr-tag.user-ok { background: rgba(0,212,170,0.15); color: var(--success); }
+  .corr-tag.user-ko { background: rgba(255,83,112,0.15); color: var(--danger); }
+  .corr-tag.ans { background: rgba(108,99,255,0.15); color: var(--accent); }
+  .corr-exp { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    background: none;
+    border: none;
+    font-family: var(--font);
+  }
+  .back-btn:hover { color: var(--text); }
+
+  @media (max-width: 500px) {
+    .home-stats { grid-template-columns: repeat(3,1fr); }
+    .ans-row { grid-template-columns: 1fr 1fr; }
+    .result-stats { grid-template-columns: repeat(3,1fr); }
+    .q-text { font-size: 15px; }
+    .theme-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="site-header">
+    <div class="badge">Master 1 · USTHB · Télécommunications</div>
+    <h1>Quiz Vrai / Faux<br>Éthique, Déontologie & PI</h1>
+    <p>Module complet · 120 questions · Adapté examen universitaire</p>
+  </header>
+
+  <!-- ══ HOME ══ -->
+  <div id="screen-home" class="screen active">
+    <div class="home-stats">
+      <div class="stat-card"><div class="val" id="total-q">120</div><div class="lbl">Questions</div></div>
+      <div class="stat-card"><div class="val" id="total-th">13</div><div class="lbl">Thèmes</div></div>
+      <div class="stat-card"><div class="val">∞</div><div class="lbl">Essais</div></div>
+    </div>
+
+    <div class="section-title">Mode d'entraînement</div>
+    <div class="options-row">
+      <button class="toggle-btn on" id="tog-shuffle" onclick="toggleOpt('shuffle')">🔀 Mélanger</button>
+      <button class="toggle-btn" id="tog-all" onclick="selectAll()">📚 Toutes les questions</button>
+    </div>
+
+    <div class="section-title">Choisir un thème (optionnel)</div>
+    <div class="theme-grid" id="theme-grid"></div>
+
+    <button class="btn btn-primary" onclick="startQuiz()">Commencer le quiz →</button>
+  </div>
+
+  <!-- ══ QUIZ ══ -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-topbar">
+      <span class="q-counter" id="q-counter">1 / 120</span>
+      <div class="prog-wrap"><div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div></div>
+      <span class="score-live" id="score-live">✓ 0</span>
+    </div>
+
+    <div class="q-card" id="q-card">
+      <div class="theme-tag" id="q-theme-tag">Thème</div>
+      <div class="q-text" id="q-text">Question...</div>
+      <div class="ans-row">
+        <button class="ans-btn" id="btn-true" onclick="answer(true)">✓ Vrai</button>
+        <button class="ans-btn" id="btn-false" onclick="answer(false)">✗ Faux</button>
+      </div>
+      <div class="feedback-box" id="feedback">
+        <div class="feedback-result" id="fb-result"></div>
+        <div class="feedback-exp" id="fb-exp"></div>
+      </div>
+    </div>
+
+    <div class="btn-next-wrap" id="btn-next-wrap">
+      <button class="btn btn-primary" onclick="nextQ()">Question suivante →</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULTS ══ -->
+  <div id="screen-result" class="screen">
+    <div class="result-hero">
+      <div class="result-circle" id="result-circle">
+        <span class="result-pct" id="result-pct">0%</span>
+      </div>
+      <div class="result-msg" id="result-msg">Résultat</div>
+      <div class="result-sub" id="result-sub"></div>
+    </div>
+    <div class="result-stats">
+      <div class="result-stat"><div class="n g" id="r-correct">0</div><div class="l">Correctes</div></div>
+      <div class="result-stat"><div class="n r" id="r-wrong">0</div><div class="l">Fausses</div></div>
+      <div class="result-stat"><div class="n b" id="r-total">0</div><div class="l">Total</div></div>
+    </div>
+    <div class="result-btns">
+      <button class="btn btn-secondary" onclick="showCorrections()">📋 Voir les corrections</button>
+      <button class="btn btn-primary" onclick="restart()">🔄 Recommencer</button>
+    </div>
+  </div>
+
+  <!-- ══ CORRECTIONS ══ -->
+  <div id="screen-corrections" class="screen">
+    <button class="back-btn" onclick="showResult()">← Retour aux résultats</button>
+    <div class="section-title">Récapitulatif de vos réponses</div>
+    <div id="corr-list"></div>
+  </div>
+
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // ── ÉTHIQUE ──
+  {theme:"Éthique",question:"L'éthique comprend un ensemble de valeurs et fait référence à la culture organisationnelle d'une entreprise ou d'un organisme.",answer:true,explanation:"L'éthique est liée à la culture organisationnelle et vise à donner une image à l'organisme autour de valeurs fondatrices."},
+  {theme:"Éthique",question:"L'étude formelle de l'éthique a commencé au Moyen Âge avec les philosophes scolastiques.",answer:false,explanation:"L'étude formelle de l'éthique commence dans la Grèce antique. Socrate est considéré comme le premier philosophe de l'éthique."},
+  {theme:"Éthique",question:"Platon est le penseur de l'Idée du Bien, considérée comme lumière et possibilité d'accès à la connaissance.",answer:true,explanation:"C'est la conception platonicienne de l'Idée du Bien, centrale dans sa philosophie."},
+  {theme:"Éthique",question:"L'éthique de l'environnement, la bioéthique et l'éthique animale sont toutes des domaines d'application de l'éthique.",answer:true,explanation:"Ces domaines font partie des nombreux champs d'application de l'éthique contemporaine."},
+  {theme:"Éthique",question:"Pour la science, l'éthique détermine les exigences pour participer à l'avancement scientifique.",answer:false,explanation:"C'est la déontologie qui détermine les exigences pour participer. L'éthique, elle, délimite le domaine ouvert à l'avancement."},
+  {theme:"Éthique",question:"La notion déontologique est basée sur la croyance que certains comportements comme mentir ou voler sont mauvais quel que soit le contexte.",answer:true,explanation:"C'est le principe fondamental de la déontologie : certains actes sont intrinsèquement mauvais, indépendamment de leur contexte."},
+  {theme:"Éthique",question:"L'éthique professionnelle est strictement identique à la déontologie professionnelle dans tous ses aspects.",answer:false,explanation:"Les deux sont proches mais différentes : l'éthique professionnelle est suggestive et basée sur des valeurs, tandis que la déontologie est contraignante et juridiquement opposable."},
+  {theme:"Éthique",question:"Dans une entreprise, l'éthique appliquée peut être considérée comme une sorte de morale collective ayant fait l'objet d'un consensus.",answer:true,explanation:"L'éthique d'entreprise est effectivement une morale collective, souvent implicite, qui résulte d'un consensus partagé."},
+  {theme:"Éthique",question:"La décision juste en entreprise dépend uniquement de la situation et du projet en cours.",answer:false,explanation:"La formule est : Décision juste = (situation/projet) + (éthique/vertus) + (déontologie/métier/valeurs/entreprise)."},
+  {theme:"Éthique",question:"L'éthique des mathématiques est un domaine d'application reconnu de l'éthique.",answer:true,explanation:"Oui, l'éthique des mathématiques est citée parmi les domaines d'application de l'éthique dans le cours."},
+
+  // ── MORALE ──
+  {theme:"Morale",question:"La société détermine la morale, et c'est ensuite la morale qui influence la loi.",answer:true,explanation:"Dans le schéma du cours, la société détermine la morale et, à travers elle directement, la loi."},
+  {theme:"Morale",question:"Les règles morales sont figées et n'évoluent pas avec la société.",answer:false,explanation:"Les règles associées à chaque concept (moral, éthique, juridique, déontologique) résultent des décisions de la société et évoluent avec elle."},
+  {theme:"Morale",question:"La morale individuelle et l'éthique d'entreprise désignent exactement la même chose.",answer:false,explanation:"En entreprise, on s'éloigne de la morale individuelle pour se rapprocher d'une éthique appliquée collective."},
+  {theme:"Morale",question:"La morale est antérieure à la loi dans le schéma des dépendances entre concepts.",answer:true,explanation:"La société détermine la morale, et la morale détermine ensuite la loi. La morale est donc antérieure à la loi dans ce schéma."},
+  {theme:"Morale",question:"Un acte peut être légal mais contraire à la morale.",answer:true,explanation:"Légalité et moralité ne se confondent pas toujours. Un acte peut être autorisé par la loi tout en étant moralement répréhensible."},
+
+  // ── DÉONTOLOGIE ──
+  {theme:"Déontologie",question:"Le terme 'déontologie' est dérivé des termes grecs signifiant 'devoir' et 'science'.",answer:true,explanation:"Deon (devoir) + logos (science) = déontologie, la science du devoir."},
+  {theme:"Déontologie",question:"Immanuel Kant est le philosophe du XVIIIe siècle à qui on associe principalement la déontologie.",answer:true,explanation:"Kant est le père fondateur de la déontologie moderne avec son impératif catégorique."},
+  {theme:"Déontologie",question:"Selon la déontologie, la justesse ou le mal d'une action peut être influencée par ses conséquences positives.",answer:false,explanation:"Selon la déontologie, la justesse ou le mal d'une action est déterminée exclusivement par sa nature, et ne peut être affectée par les conséquences."},
+  {theme:"Déontologie",question:"Jeremy Bentham a inventé le mot déontologie avant 1816 comme synonyme de l'éthique.",answer:true,explanation:"Avant 1816, Jeremy Bentham avait inventé le même mot comme synonyme de l'éthique ou censure morale."},
+  {theme:"Déontologie",question:"Charlie Broad a utilisé le terme 'déontologique' dans son livre 'Five Types de théorie éthique' publié en 1930.",answer:true,explanation:"C'est bien Charlie Broad qui a formalisé la définition actuelle du terme déontologique dans ce livre de 1930."},
+  {theme:"Déontologie",question:"La déontologie renforce la reconnaissance institutionnelle de la profession.",answer:true,explanation:"La déontologie donne une existence réglementaire au code professionnel, le rendant opposable sur le plan juridique."},
+  {theme:"Déontologie",question:"Selon les déontologues, le mensonge peut être acceptable si ses conséquences sont très bénéfiques.",answer:false,explanation:"Les déontologues considèrent que le mensonge est intrinsèquement mauvais, quel que soit le résultat possible."},
+  {theme:"Déontologie",question:"La déontologie est une branche de la philosophie morale qui met l'accent sur le respect des principes, quelles que soient les influences externes.",answer:true,explanation:"Aujourd'hui, la déontologie est largement acceptée comme une branche qui met l'accent sur l'adhésion aux principes moraux, quelles que soient les influences ou résultats externes."},
+  {theme:"Déontologie",question:"L'honnêteté comme valeur déontologique impose de dire la vérité uniquement si les conséquences sont favorables.",answer:false,explanation:"L'honnêteté déontologique impose de dire la vérité quoi qu'il arrive, même si cela conduit à des résultats défavorables."},
+  {theme:"Déontologie",question:"La non-violence comme valeur déontologique interdit d'utiliser la violence même pour obtenir un résultat juste.",answer:true,explanation:"Selon la non-violence déontologique, s'abstenir de la violence est un devoir même si cela peut conduire à un résultat souhaitable."},
+  {theme:"Déontologie",question:"L'humilité déontologique consiste à ne pas prendre le mérite de quelque chose que l'on n'a pas fait soi-même.",answer:true,explanation:"L'humilité consiste à montrer la modestie et ne pas s'attribuer indûment un mérite collectif."},
+  {theme:"Déontologie",question:"La déontologie professionnelle et l'éthique professionnelle sont deux notions totalement distinctes sans aucun lien.",answer:false,explanation:"Dans la vie courante, ces deux notions sont proches et parfois intimement mêlées. Leur distinction est subtile mais réelle."},
+
+  // ── CHARTE D'ÉTHIQUE UNIVERSITAIRE ──
+  {theme:"Charte d'éthique universitaire",question:"L'enseignant-chercheur doit s'abstenir d'engager la responsabilité de l'établissement à des fins personnelles.",answer:true,explanation:"C'est l'un des devoirs fondamentaux de l'enseignant-chercheur dans le cadre de sa déontologie professionnelle."},
+  {theme:"Charte d'éthique universitaire",question:"L'enseignant-chercheur peut enseigner ce qu'il souhaite sans obligation d'achever les programmes officiels.",answer:false,explanation:"Le respect des règles pédagogiques inclut l'achèvement des programmes. C'est un devoir explicite."},
+  {theme:"Charte d'éthique universitaire",question:"L'enseignant-chercheur doit accepter la confrontation loyale des points de vue différents.",answer:true,explanation:"C'est un principe fondamental de l'intégrité académique : accepter la confrontation loyale des idées."},
+  {theme:"Charte d'éthique universitaire",question:"L'enseignant-chercheur peut combiner enseignement et propagande idéologique si celle-ci est de nature scientifique.",answer:false,explanation:"L'enseignant doit combiner enseignement et recherche 'loin de toute forme de propagande et d'endoctrinement'."},
+  {theme:"Charte d'éthique universitaire",question:"La conscience professionnelle est l'une des vertus exigées de l'enseignant-chercheur.",answer:true,explanation:"'Faire preuve de conscience professionnelle' est explicitement cité parmi les vertus de l'enseignant-chercheur."},
+  {theme:"Charte d'éthique universitaire",question:"L'enseignant-chercheur doit fonder ses travaux sur une quête sincère du savoir, en évitant notamment le plagiat.",answer:true,explanation:"C'est une obligation directe : 'Fonder ses travaux sur une quête sincère du savoir : attention au plagiat.'"},
+  {theme:"Charte d'éthique universitaire",question:"Le personnel administratif et technique peut s'ingérer dans les actes pédagogiques s'il juge cela nécessaire.",answer:false,explanation:"Le personnel administratif doit s'interdire toute ingérence dans les actes pédagogiques et scientifiques."},
+  {theme:"Charte d'éthique universitaire",question:"La transparence impose au personnel administratif d'accomplir ses fonctions de façon à permettre la bonne circulation de l'information.",answer:true,explanation:"La transparence est l'une des 7 valeurs fondamentales du personnel administratif, impliquant traçabilité et circulation de l'information."},
+
+  // ── DROITS ET DEVOIRS DE L'ÉTUDIANT ──
+  {theme:"Droits et devoirs de l'étudiant",question:"L'étudiant a droit à un enseignement de qualité utilisant des méthodes pédagogiques modernes et adaptées.",answer:true,explanation:"C'est un droit fondamental : droit à un encadrement de qualité qui utilise des méthodes pédagogiques modernes."},
+  {theme:"Droits et devoirs de l'étudiant",question:"Les notes doivent être remises aux étudiants dans un délai maximal fixé par les comités pédagogiques, accompagnées du corrigé et du barème.",answer:true,explanation:"Ce droit est explicitement mentionné : remise des notes avec corrigé et barème dans des délais raisonnables."},
+  {theme:"Droits et devoirs de l'étudiant",question:"Un étudiant peut présenter un recours s'il s'estime lésé dans la correction d'une épreuve.",answer:true,explanation:"Ce droit de recours est explicitement prévu dans la charte des droits de l'étudiant."},
+  {theme:"Droits et devoirs de l'étudiant",question:"L'étudiant doit respecter les résultats des jurys de délibération, même s'il les conteste.",answer:true,explanation:"C'est un devoir explicite de l'étudiant : respecter les résultats des jurys de délibération."},
+  {theme:"Droits et devoirs de l'étudiant",question:"L'étudiant a le droit de créer des associations politiques au sein de l'université.",answer:false,explanation:"Les associations estudiantines autorisées sont à caractère scientifique, artistique, culturel et sportif. Elles ne doivent pas s'immiscer dans la gestion administrative."},
+  {theme:"Droits et devoirs de l'étudiant",question:"L'étudiant doit fournir des informations exactes lors de son inscription administrative.",answer:true,explanation:"C'est un devoir explicite : fournir des informations exactes et précises lors de l'inscription."},
+  {theme:"Droits et devoirs de l'étudiant",question:"L'étudiant a le droit de subir des discriminations liées à son genre si elles sont justifiées par un règlement intérieur.",answer:false,explanation:"L'étudiant ne doit subir aucune discrimination liée au genre ou à toute autre particularité. Ce droit est absolu."},
+  {theme:"Droits et devoirs de l'étudiant",question:"L'étudiant en post-graduation a droit à un encadrement de qualité ainsi qu'à des mesures de soutien pour sa recherche.",answer:true,explanation:"Ce droit spécifique aux doctorants est explicitement mentionné dans la charte."},
+  {theme:"Droits et devoirs de l'étudiant",question:"Un étudiant qui fraudule peut être sanctionné, mais les sanctions doivent lui être communiquées avant tout.",answer:true,explanation:"L'étudiant doit être dûment informé des fautes qui lui sont reprochées avant que les sanctions ne soient appliquées."},
+
+  // ── DROITS ET DEVOIRS DE L'ENSEIGNANT ──
+  {theme:"Droits et devoirs de l'enseignant",question:"L'enseignant-chercheur doit avoir une formation spécialisée pointue et un esprit novateur et créatif.",answer:true,explanation:"Ces qualités sont explicitement listées comme caractéristiques attendues du cadre formé par l'enseignement supérieur."},
+  {theme:"Droits et devoirs de l'enseignant",question:"La persévérance est considérée comme une vertu particulièrement utile pour les chefs de projet en milieu universitaire.",answer:true,explanation:"Le cours mentionne que 'la persévérance pourrait être considérée comme une vertu' pour les chefs de projet."},
+  {theme:"Droits et devoirs de l'enseignant",question:"L'enseignant-chercheur n'est pas tenu de se mettre à jour sur les nouvelles méthodes d'enseignement si ses cours sont déjà établis.",answer:false,explanation:"L'actualisation des connaissances et des méthodes d'enseignement est un devoir explicite de l'enseignant-chercheur."},
+  {theme:"Droits et devoirs de l'enseignant",question:"L'esprit d'équipe et la disponibilité font partie des vertus collégiales attendues dans l'enseignement supérieur.",answer:true,explanation:"Ces vertus sont explicitement citées parmi les vertus collégiales en entreprise et en milieu académique."},
+  {theme:"Droits et devoirs de l'enseignant",question:"Le personnel administratif bénéficie de conditions adéquates et de dispositifs de formation continue.",answer:true,explanation:"Ces droits sont explicitement mentionnés parmi les droits du personnel administratif et technique."},
+
+  // ── FRAUDE, PLAGIAT ET SANCTIONS ──
+  {theme:"Fraude, plagiat et sanctions",question:"Le mot 'plagiat' vient du grec 'plagios' qui signifiait 'ce qui est oblique, fourbe'.",answer:true,explanation:"C'est l'étymologie exacte du mot plagiat, passé ensuite au latin 'plagiarius'."},
+  {theme:"Fraude, plagiat et sanctions",question:"Chez les Romains, le terme 'plagiarius' désignait quelqu'un qui volait ou kidnappait des esclaves ou des enfants.",answer:true,explanation:"Historiquement, plagiarius était celui qui kidnappait les esclaves ou les enfants d'autrui."},
+  {theme:"Fraude, plagiat et sanctions",question:"Traduire un texte étranger avec un logiciel sans citer la source est une forme de plagiat.",answer:true,explanation:"Traduire (y compris avec un logiciel de traduction) sans indiquer la source est explicitement listé comme une forme de plagiat."},
+  {theme:"Fraude, plagiat et sanctions",question:"Payer quelqu'un pour rédiger son mémoire (ghostwriting) n'est pas considéré comme du plagiat.",answer:false,explanation:"Payer quelqu'un pour faire son travail académique est explicitement cité comme une forme de plagiat."},
+  {theme:"Fraude, plagiat et sanctions",question:"L'Arrêté n°933 du 28 juillet 2016 fixe les règles relatives à la prévention et la lutte contre le plagiat en Algérie.",answer:true,explanation:"C'est bien l'Arrêté 933/2016 qui constitue le cadre juridique de lutte contre le plagiat dans l'enseignement supérieur algérien."},
+  {theme:"Fraude, plagiat et sanctions",question:"Selon l'Arrêté 933, le plagiat d'un étudiant ne peut être sanctionné qu'avant la soutenance de son mémoire.",answer:false,explanation:"L'article 35 précise : 'avant ou après sa soutenance', l'auteur s'expose à l'annulation de la soutenance ou au retrait du titre."},
+  {theme:"Fraude, plagiat et sanctions",question:"L'article 36 de l'Arrêté 933 concerne spécifiquement les enseignants-chercheurs et leurs publications.",answer:true,explanation:"L'article 36 traite des actes de plagiat commis par les enseignants-chercheurs dans leurs travaux pédagogiques et scientifiques."},
+  {theme:"Fraude, plagiat et sanctions",question:"La difficulté du travail est une des causes identifiées du plagiat chez les étudiants.",answer:true,explanation:"Parmi les causes du plagiat étudiant : 'La difficulté du travail : faire des recherches c'est dur et il y a des gens plus intelligents que moi'."},
+  {theme:"Fraude, plagiat et sanctions",question:"La pression à la publication (publish or perish) est une cause reconnue du plagiat chez les enseignants-chercheurs.",answer:true,explanation:"C'est la première cause citée pour les enseignants-chercheurs : 'La pression à la publication'."},
+  {theme:"Fraude, plagiat et sanctions",question:"Le taux de plagiat identifié est l'un des critères d'évaluation des logiciels anti-plagiat.",answer:true,explanation:"C'est bien le premier critère listé pour l'analyse et la classification des logiciels anti-plagiat."},
+  {theme:"Fraude, plagiat et sanctions",question:"Turnitin, Compilatio et Urkund sont des logiciels gratuits de détection du plagiat.",answer:false,explanation:"Ces solutions (Turnitin, Compilatio, Ephorus, Urkund) sont des solutions payantes. Les outils gratuits incluent Copyscape, Article Checker et Dupli Checker."},
+  {theme:"Fraude, plagiat et sanctions",question:"Dans la recherche scientifique, le plagiat est plus grave que dans la littérature car il obstrue la progression scientifique.",answer:true,explanation:"Le plagiat dans la recherche est 'beaucoup plus grave car en évitant d'indiquer les sources il y a obstruction de progression scientifique'."},
+  {theme:"Fraude, plagiat et sanctions",question:"Les mesures contre le plagiat incluent la formation, la dissuasion, la détection et la sanction.",answer:true,explanation:"La lutte contre le plagiat se fait sur plusieurs niveaux : formation/prévention, dissuasion, détection et sanction."},
+  {theme:"Fraude, plagiat et sanctions",question:"Wikipedia peut être citée comme source primaire dans un travail académique.",answer:false,explanation:"Wikipedia n'est pas une source primaire mais tertiaire. Les pages changent en permanence et n'ont pas d'auteur unique. Elle sert en première approche d'un sujet."},
+  {theme:"Fraude, plagiat et sanctions",question:"La mesure de dissuasion contre le plagiat repose sur la certitude d'une sanction en cas de découverte.",answer:true,explanation:"La dissuasion 'c'est la certitude d'une sanction en cas de découverte de plagiat, et l'annulation du diplôme ou publication obtenus grâce au plagiat'."},
+
+  // ── PROPRIÉTÉ INTELLECTUELLE ──
+  {theme:"Propriété intellectuelle",question:"La première véritable législation attribuant un monopole d'exploitation sur une invention est apparue à Venise en 1474.",answer:true,explanation:"La loi vénitienne de 1474 est souvent considérée comme l'une des premières lois modernes sur la propriété intellectuelle."},
+  {theme:"Propriété intellectuelle",question:"Les premières lois modernes sur la propriété intellectuelle sont apparues en 1790 aux États-Unis et en 1791 en France.",answer:true,explanation:"Ces dates sont citées dans le cours comme celles des premières lois modernes sur la PI."},
+  {theme:"Propriété intellectuelle",question:"La propriété intellectuelle comporte uniquement le volet de la propriété littéraire et artistique.",answer:false,explanation:"La propriété intellectuelle comporte deux volets : la propriété littéraire et artistique (PLA) et la propriété industrielle."},
+  {theme:"Propriété intellectuelle",question:"L'expression 'propriété intellectuelle' désigne les œuvres de l'esprit, les inventions et les emblèmes utilisés dans le commerce.",answer:true,explanation:"C'est la définition exacte de la propriété intellectuelle donnée dans le cours."},
+  {theme:"Propriété intellectuelle",question:"La loi vénitienne de 1474 précisait que le monopole d'exploitation était accordé sans contrepartie.",answer:false,explanation:"La loi précisait que le monopole était 'la contrepartie du partage de la connaissance à une échelle universelle'."},
+  {theme:"Propriété intellectuelle",question:"Les droits de propriété intellectuelle protègent votre propriété intellectuelle de toute utilisation abusive.",answer:true,explanation:"C'est la définition fondamentale des DPI : protéger les créations contre toute utilisation abusive."},
+  {theme:"Propriété intellectuelle",question:"L'enregistrement d'un droit de PI permet de le protéger et d'en assurer l'exclusivité, permettant de rentabiliser les coûts de R&D.",answer:true,explanation:"C'est la raison principale de déposer un DPI : protection exclusive + rentabilisation des coûts de recherche et développement."},
+  {theme:"Propriété intellectuelle",question:"Dans une université, l'inventeur-salarié est toujours le premier titulaire des droits sur son invention.",answer:false,explanation:"Si l'invention est réalisée dans l'exercice de l'emploi et que la réalisation d'inventions fait partie des tâches attendues, l'employeur peut être le premier titulaire."},
+
+  // ── DROIT D'AUTEUR ──
+  {theme:"Droit d'auteur",question:"Le droit d'auteur naît automatiquement avec la création de l'œuvre, sans enregistrement obligatoire.",answer:true,explanation:"Les droits d'auteur naissent avec la création de l'œuvre. Il n'est pas indispensable d'enregistrer l'œuvre pour les voir reconnus."},
+  {theme:"Droit d'auteur",question:"Une chorégraphie n'est protégée par le droit d'auteur que si les mouvements sont filmés ou écrits en notation scénique.",answer:true,explanation:"Dans certains pays, la création doit être matérialisée. Pour une chorégraphie, elle doit être filmée ou écrite pour être protégée."},
+  {theme:"Droit d'auteur",question:"Le droit moral de l'auteur est perpétuel, imprescriptible et inaliénable.",answer:true,explanation:"Contrairement aux droits patrimoniaux, le droit moral ne peut jamais être cédé et ne s'éteint pas avec le temps."},
+  {theme:"Droit d'auteur",question:"Les droits patrimoniaux de l'auteur peuvent être cédés à un tiers.",answer:true,explanation:"Contrairement au droit moral, les droits patrimoniaux ou une partie d'entre eux peuvent être cédés."},
+  {theme:"Droit d'auteur",question:"Le droit de divulgation permet à l'auteur d'empêcher toute copie ou mutilation de l'œuvre qui pourrait nuire à son honneur.",answer:false,explanation:"Le droit de divulgation permet à l'auteur de rendre son œuvre publique. C'est le 'droit au respect de l'œuvre' qui empêche la mutilation."},
+  {theme:"Droit d'auteur",question:"Les droits connexes protègent les artistes interprètes, les producteurs d'enregistrements et les organismes de radiodiffusion.",answer:true,explanation:"Ces trois catégories d'intermédiaires bénéficient des droits connexes (ou droits voisins)."},
+  {theme:"Droit d'auteur",question:"La durée de protection des droits connexes est de 50 ans à compter du jour où la prestation ou l'enregistrement a lieu.",answer:true,explanation:"Les droits connexes offrent une protection de 50 ans, identique aux droits d'auteur."},
+  {theme:"Droit d'auteur",question:"Les logiciels et bases de données sont considérés comme des œuvres numériques protégées par le droit d'auteur.",answer:true,explanation:"Les programmes d'ordinateur, logiciels et bases de données font partie des œuvres numériques protégeables par le droit d'auteur."},
+  {theme:"Droit d'auteur",question:"L'auteur d'une œuvre créée pour le compte d'un employeur est toujours la personne physique qui a créé l'œuvre.",answer:true,explanation:"L'auteur est toujours la personne physique qui a créé l'œuvre. Le contrat avec l'employeur peut toutefois concerner l'exploitation des droits patrimoniaux."},
+  {theme:"Droit d'auteur",question:"L'enveloppe Soleau est un moyen de prouver la date de création d'une œuvre.",answer:true,explanation:"L'enveloppe Soleau est un outil officiel permettant de prouver la paternité et la date d'une création."},
+  {theme:"Droit d'auteur",question:"Le droit d'auteur protège les idées elles-mêmes, indépendamment de leur expression.",answer:false,explanation:"Le droit d'auteur protège la manière dont sont exprimées les idées, pas les idées elles-mêmes."},
+
+  // ── BREVETS ──
+  {theme:"Brevets",question:"Un brevet confère à son titulaire un droit exclusif d'exploitation pendant 20 ans à partir de la date de dépôt.",answer:true,explanation:"La durée de protection d'un brevet est de 20 ans après la date de dépôt de la demande."},
+  {theme:"Brevets",question:"Un brevet délivré dans un pays est automatiquement valable dans tous les pays signataires de conventions internationales.",answer:false,explanation:"La protection est valable seulement dans le pays qui délivre le brevet. Il faut faire une demande pour chaque pays souhaité."},
+  {theme:"Brevets",question:"Les principes scientifiques et les théories abstraites peuvent être brevetés.",answer:false,explanation:"Les principes scientifiques ou conceptions théoriques sont explicitement non brevetables."},
+  {theme:"Brevets",question:"Pour être brevetée, une invention doit être nouvelle, utile, témoigner d'ingéniosité et ne pas relever de l'évidence.",answer:true,explanation:"Ce sont les 4 conditions de brevetabilité : nouveauté, utilité, ingéniosité et non-évidence pour un expert du domaine."},
+  {theme:"Brevets",question:"Un logiciel peut être protégé indirectement par un brevet sur une invention mise en œuvre par ce logiciel.",answer:true,explanation:"Un logiciel peut être protégé indirectement par un brevet sur une invention (procédé, appareil) 'mise en œuvre' par ce logiciel."},
+  {theme:"Brevets",question:"Les méthodes de traitement médical peuvent être brevetées.",answer:false,explanation:"Les méthodes de travail (dont les traitements médicaux et habiletés professionnelles) sont non brevetables."},
+  {theme:"Brevets",question:"Pour bénéficier de toute la période de protection d'un brevet, il faut acquitter des tarifs périodiques.",answer:true,explanation:"Le maintien du brevet en vigueur nécessite le paiement de taxes périodiques pendant toute la durée de protection."},
+  {theme:"Brevets",question:"La demande de brevet doit décrire l'invention de manière détaillée pour permettre sa reproduction.",answer:true,explanation:"Une demande de brevet doit décrire l'invention de manière suffisamment détaillée pour permettre à un expert de la reproduire."},
+  {theme:"Brevets",question:"La cession d'un brevet implique un transfert définitif de propriété, tandis que la licence ne fait qu'accorder le droit d'exploitation.",answer:true,explanation:"La cession transfère la propriété définitivement. La licence accorde seulement le droit d'exploitation sans transfert de propriété."},
+  {theme:"Brevets",question:"Le secret industriel protège une invention de manière identique au brevet, avec la même durée de protection.",answer:false,explanation:"Le brevet dure 20 ans avec divulgation obligatoire. Le secret industriel n'a pas de durée limitée mais sa protection cesse si le secret est découvert."},
+  {theme:"Brevets",question:"Un inventeur salarié doit déclarer son invention à son employeur si celle-ci a été réalisée grâce à ses activités professionnelles.",answer:true,explanation:"L'inventeur salarié a, grâce à son activité professionnelle, pu réaliser l'invention. Pour cette raison, l'employeur possède les droits d'exploitation."},
+  {theme:"Brevets",question:"Il est possible de déposer une demande de brevet même après avoir publié l'invention, sans délai de grâce.",answer:false,explanation:"La demande doit être soumise avant divulgation, ou à l'intérieur d'un délai 'de grâce' maximal selon les pays."},
+
+  // ── MARQUES ──
+  {theme:"Marques",question:"Une marque commerciale peut être enregistrée comme droit de propriété industrielle.",answer:true,explanation:"Les marques font partie des droits de propriété industrielle, aux côtés des brevets, dessins et modèles."},
+  {theme:"Marques",question:"Le nom d'un véhicule automobile peut être enregistré comme marque.",answer:true,explanation:"Le nom du véhicule peut être enregistré comme marque, tandis que sa technique peut faire l'objet d'un brevet."},
+  {theme:"Marques",question:"Une marque et un brevet protègent exactement les mêmes types de créations.",answer:false,explanation:"Le brevet protège les inventions techniques. La marque protège les signes distinctifs (nom, logo) utilisés dans le commerce."},
+  {theme:"Marques",question:"Les marques, les dessins ou modèles et les variétés végétales font partie des droits de propriété industrielle.",answer:true,explanation:"Ces droits, ainsi que les brevets, constituent les droits de propriété industrielle."},
+
+  // ── DESSINS ET MODÈLES INDUSTRIELS ──
+  {theme:"Dessins et modèles industriels",question:"L'apparence visuelle d'un produit (forme, couleur, design) peut être protégée par un enregistrement de modèle.",answer:true,explanation:"Les caractéristiques visuelles (design) peuvent être enregistrées en tant que modèle. Exemple : apparence d'un véhicule automobile."},
+  {theme:"Dessins et modèles industriels",question:"Un dessin industriel protège uniquement la fonctionnalité technique d'un produit.",answer:false,explanation:"Un dessin ou modèle industriel protège les aspects visuels et esthétiques d'un produit, pas sa fonctionnalité technique (qui relève du brevet)."},
+  {theme:"Dessins et modèles industriels",question:"Pour un véhicule automobile, sa technique (moteur, châssis) peut faire l'objet d'un brevet tandis que son design peut être enregistré comme modèle.",answer:true,explanation:"C'est un exemple illustratif donné dans le cours : brevet pour la technique, modèle pour le design."},
+
+  // ── INDICATIONS GÉOGRAPHIQUES ──
+  {theme:"Indications géographiques",question:"Les indications géographiques sont mentionnées parmi les droits de propriété intellectuelle.",answer:true,explanation:"Les indications géographiques font partie de la propriété industrielle, protégeant les produits liés à une origine géographique."},
+  {theme:"Indications géographiques",question:"L'histoire rapporte que la ville de Sybaris accordait un monopole d'exploitation d'un an au cuisinier qui inventait un plat nouveau, ce qui est une forme ancienne de protection intellectuelle.",answer:true,explanation:"Athénée, auteur grec vivant six siècles avant notre ère, rapporte cette pratique de la ville de Sybaris, précurseur des protections intellectuelles."},
+
+  // ── PROTECTION JURIDIQUE ──
+  {theme:"Protection juridique",question:"La science ouverte inclut l'accès libre aux publications scientifiques sans restriction et sans frais.",answer:true,explanation:"L'accès libre est, au minimum, l'accès en ligne sans restriction, sans frais, dès la publication, au texte intégral des documents."},
+  {theme:"Protection juridique",question:"La licence Creative Commons BY impose uniquement de mentionner le nom de l'auteur selon la manière dont il le demande.",answer:true,explanation:"BY = Attribution : seule obligation = citer l'auteur selon la manière dont il le demande."},
+  {theme:"Protection juridique",question:"La licence Creative Commons ND interdit toute modification de l'œuvre.",answer:true,explanation:"ND = No Derivatives = pas de modification. L'œuvre ne peut être ni adaptée ni transformée."},
+  {theme:"Protection juridique",question:"La licence CC0 permet à l'auteur de conserver certains de ses droits tout en autorisant une utilisation libre.",answer:false,explanation:"CC0 signifie l'abandon total des droits. L'auteur place l'œuvre dans le domaine public et renonce à tous ses droits."},
+  {theme:"Protection juridique",question:"La licence Creative Commons SA impose que toute œuvre dérivée soit diffusée sous la même licence.",answer:true,explanation:"SA = Share Alike = Partage à l'identique : l'œuvre dérivée doit être diffusée sous la même licence."},
+  {theme:"Protection juridique",question:"Toutes les licences Creative Commons permettent la distribution de copies imprimées et la rediffusion en ligne.",answer:true,explanation:"Toutes les licences CC permettent la distribution non limitée de copies imprimées et la rediffusion en ligne."},
+  {theme:"Protection juridique",question:"Les données quantitatives numériques d'une recherche peuvent être protégées par le droit d'auteur si leur structuration implique du talent et du jugement.",answer:true,explanation:"La protection via droit d'auteur s'applique aux données si leur structuration/organisation implique du talent ou du jugement."},
+  {theme:"Protection juridique",question:"La Déclaration de Singapour sur l'intégrité en recherche a été établie lors de la 2e Conférence mondiale à Singapour en juillet 2010.",answer:true,explanation:"C'est lors de la 2e Conférence mondiale sur l'intégrité en recherche, Singapour, 21-24 juillet 2010."},
+  {theme:"Protection juridique",question:"Selon la Déclaration de Singapour, les chercheurs doivent limiter leurs commentaires publics à leur domaine de compétence.",answer:true,explanation:"Responsabilité n°10 : les chercheurs doivent 'limiter leurs commentaires à leur domaine de compétence' dans les débats publics."},
+  {theme:"Protection juridique",question:"La Déclaration de Singapour établit 4 principes généraux et 14 responsabilités spécifiques.",answer:true,explanation:"Les 4 principes généraux (honnêteté, conduite responsable, courtoisie, bonne gestion) se déclinent en 14 responsabilités."},
+  {theme:"Protection juridique",question:"Selon la Déclaration de Singapour, il est normal de ne pas déclarer un conflit d'intérêt financier si celui-ci est minime.",answer:false,explanation:"Responsabilité n°9 : les chercheurs 'doivent déclarer les conflits d'intérêts financiers ou autres' sans exception de minimis."},
+  {theme:"Protection juridique",question:"La liste des auteurs d'une publication scientifique peut inclure des personnes dont la contribution était minime, pour leur faire honneur.",answer:false,explanation:"Responsabilité n°6 : 'La liste des auteurs doit inclure ceux et seulement ceux qui remplissent les critères de la qualité d'auteur.'"},
+  {theme:"Protection juridique",question:"Les institutions de recherche ont l'obligation de protéger les personnes qui signalent de bonne foi des manquements à l'intégrité.",answer:true,explanation:"Responsabilité n°12 : les institutions 'doivent disposer de procédures pour... protéger ceux qui rapportent de bonne foi ces actes'."},
+  {theme:"Protection juridique",question:"ResearchGate est décrit dans le cours comme un réseau social pour chercheurs, parfois appelé 'le Facebook des chercheurs'.",answer:true,explanation:"Le cours cite ResearchGate comme exemple d'intelligence collective dans la science ouverte, le qualifiant de 'Facebook des chercheurs'."},
+  {theme:"Protection juridique",question:"Le secret industriel protège uniquement les informations qui ont été brevetées mais dont on veut garder les détails secrets.",answer:false,explanation:"Le secret industriel protège des informations ayant une valeur pour l'entreprise et clairement désignées comme confidentielles. Il est alternatif, non complémentaire, au brevet."},
+  {theme:"Protection juridique",question:"Selon les règles d'intégrité en recherche, les chercheurs doivent communiquer leurs résultats le plus rapidement possible pour établir la propriété intellectuelle et l'antériorité.",answer:true,explanation:"Responsabilité n°5 : 'Les chercheurs doivent, dès qu'ils en ont la possibilité, communiquer rapidement et ouvertement leurs résultats.'"},
+];
+
+const THEMES = [...new Set(ALL_QUESTIONS.map(q=>q.theme))].sort();
+let selectedTheme = null;
+let shuffleMode = true;
+let quiz = [];
+let current = 0;
+let score = 0;
+let answers = [];
+let answered = false;
+
+function init() {
+  document.getElementById('total-q').textContent = ALL_QUESTIONS.length;
+  document.getElementById('total-th').textContent = THEMES.length;
+  const grid = document.getElementById('theme-grid');
+  grid.innerHTML = '';
+  THEMES.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'theme-btn';
+    const count = ALL_QUESTIONS.filter(q=>q.theme===t).length;
+    btn.innerHTML = `${t} <span style="color:var(--muted);font-size:10px;">(${count})</span>`;
+    btn.onclick = () => selectTheme(t, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function selectTheme(t, btn) {
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
+  if (selectedTheme === t) {
+    selectedTheme = null;
+  } else {
+    selectedTheme = t;
+    btn.classList.add('selected');
+  }
+}
+
+function selectAll() {
+  selectedTheme = null;
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
+}
+
+function toggleOpt(opt) {
+  if (opt === 'shuffle') {
+    shuffleMode = !shuffleMode;
+    document.getElementById('tog-shuffle').classList.toggle('on', shuffleMode);
+  }
+}
+
+function startQuiz() {
+  quiz = selectedTheme
+    ? ALL_QUESTIONS.filter(q => q.theme === selectedTheme)
+    : [...ALL_QUESTIONS];
+  if (shuffleMode) quiz = quiz.sort(() => Math.random() - 0.5);
+  current = 0; score = 0; answers = []; answered = false;
+  showScreen('quiz');
+  renderQ();
+}
+
+function renderQ() {
+  const q = quiz[current];
+  const pct = (current / quiz.length) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('q-counter').textContent = `${current+1} / ${quiz.length}`;
+  document.getElementById('score-live').textContent = `✓ ${score}`;
+  document.getElementById('q-theme-tag').textContent = q.theme;
+  document.getElementById('q-text').textContent = q.question;
+  const bT = document.getElementById('btn-true');
+  const bF = document.getElementById('btn-false');
+  bT.className = 'ans-btn'; bT.disabled = false; bT.innerHTML = '✓ Vrai';
+  bF.className = 'ans-btn'; bF.disabled = false; bF.innerHTML = '✗ Faux';
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback-box';
+  document.getElementById('btn-next-wrap').className = 'btn-next-wrap';
+  answered = false;
+  document.getElementById('q-card').style.animation = 'none';
+  requestAnimationFrame(() => { document.getElementById('q-card').style.animation = ''; });
+}
+
+function answer(val) {
+  if (answered) return;
+  answered = true;
+  const q = quiz[current];
+  const correct = val === q.answer;
+  if (correct) score++;
+  answers.push({ q, user: val, correct });
+  const bT = document.getElementById('btn-true');
+  const bF = document.getElementById('btn-false');
+  bT.disabled = true; bF.disabled = true;
+  if (q.answer) {
+    bT.className = 'ans-btn correct';
+    if (!correct) bF.className = 'ans-btn wrong';
+  } else {
+    bF.className = 'ans-btn correct';
+    if (!correct) bT.className = 'ans-btn wrong';
+  }
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback-box show ' + (correct ? '' : 'wrong');
+  document.getElementById('fb-result').className = 'feedback-result ' + (correct ? 'ok' : 'ko');
+  document.getElementById('fb-result').innerHTML = correct ? '✓ Bonne réponse !' : `✗ Mauvaise réponse — La bonne réponse est : <strong>${q.answer ? 'VRAI' : 'FAUX'}</strong>`;
+  document.getElementById('fb-exp').textContent = q.explanation;
+  document.getElementById('btn-next-wrap').className = 'btn-next-wrap show';
+  document.getElementById('score-live').textContent = `✓ ${score}`;
+}
+
+function nextQ() {
+  current++;
+  if (current >= quiz.length) { showResults(); return; }
+  renderQ();
+}
+
+function showResults() {
+  const pct = Math.round((score / quiz.length) * 100);
+  showScreen('result');
+  document.getElementById('result-pct').textContent = pct + '%';
+  document.getElementById('result-circle').style.setProperty('--pct', pct + '%');
+  document.getElementById('r-correct').textContent = score;
+  document.getElementById('r-wrong').textContent = quiz.length - score;
+  document.getElementById('r-total').textContent = quiz.length;
+  let msg, sub;
+  if (pct >= 90) { msg = '🏆 Excellent !'; sub = 'Tu maîtrises très bien le module. Continue !'; }
+  else if (pct >= 75) { msg = '👍 Bon niveau'; sub = 'Quelques notions à consolider, mais tu es sur la bonne voie.'; }
+  else if (pct >= 50) { msg = '📖 Niveau moyen, continue'; sub = 'Des lacunes importantes à combler. Relis le cours et refais le quiz.'; }
+  else { msg = '⚠️ Tu dois encore réviser'; sub = 'Le cours n\'est pas encore maîtrisé. Recommence depuis le début.'; }
+  document.getElementById('result-msg').textContent = msg;
+  document.getElementById('result-sub').textContent = sub;
+}
+
+function showCorrections() {
+  showScreen('corrections');
+  const list = document.getElementById('corr-list');
+  list.innerHTML = '';
+  answers.forEach((a, i) => {
+    const div = document.createElement('div');
+    div.className = 'corr-item ' + (a.correct ? 'ok' : 'ko');
+    div.innerHTML = `
+      <div class="corr-q"><strong>Q${i+1}.</strong> ${a.q.question}</div>
+      <div class="corr-row">
+        <span class="corr-tag ${a.correct?'user-ok':'user-ko'}">Vous : ${a.user?'VRAI':'FAUX'}</span>
+        <span class="corr-tag ans">Réponse : ${a.q.answer?'VRAI':'FAUX'}</span>
+      </div>
+      <div class="corr-exp">${a.q.explanation}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function showResult() { showScreen('result'); }
+
+function restart() {
+  showScreen('home');
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
+  selectedTheme = null;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+init();
+</script>
+</body>
+</html>
